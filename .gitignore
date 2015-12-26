@@ -3,6 +3,9 @@
 *.a
 *.so
 
+# Main binary
+hugodeploy
+
 # Folders
 _obj
 _test
