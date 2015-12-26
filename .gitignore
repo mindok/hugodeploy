@@ -6,6 +6,9 @@
 # Main binary
 hugodeploy
 
+# Config file
+hugodeploy.yaml
+
 # Folders
 _obj
 _test

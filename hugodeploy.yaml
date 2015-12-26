@@ -1,8 +1,0 @@
-#Test config file
-ftp: 
-  host: 192.168.0.1
-  user: john
-  pwd: ABigSecret
-sourcedir: publish
-deployRecordDir: lastpublished
-verbose: false
