@@ -56,7 +56,7 @@ Generates a list of deployment actions based on differences between sourceDir an
 
 Run `hugo preview -h` or `hugo preview --help` for information on available flags
 
-### psuh
+### push
 ```bash
 hugodeply push [flags]
 ```
@@ -101,6 +101,15 @@ ftp:
   pwd: <password>
 ```
 Note that if you are using YAML, the indent between ftp & host is 2 spaces, not a tab. 
+
+### Skipping files
+There is a naive file and directory skipping capability that currently just does a simple string.Contains test. Substrings matched are set in the SkipFiles section of the config file as follows:
+```
+skipfiles:
+  - .DS_Store
+  - .git
+  - /tmp
+```
 
 
 ### Credits

@@ -201,8 +201,8 @@ sourcedir: public
 # Skip files or directories which match the following patterns
 skipfiles:
   - .DS_Store
-  - .git*
-  - */tmp/*
+  - .git
+  - /tmp
 
 # Location of directory used for tracking what has been deployed
 deployRecordDir: deployed
