@@ -13,7 +13,7 @@ hugodeploy minifies html, css, js, json and XML by default prior to deploying. Y
 
 ## TODOs
 1. Fix up path handling for directories so they can be relative to working directory rather than absolute
-2. Modify ftp invocation infrastructure so it is substituable with another deployment method (e.g. sftp, scp). sftp is kinda done, but not test AT ALL, and not plumbed in
+2. Modify ftp invocation infrastructure so it is substituable with another deployment method (e.g. sftp, scp). sftp is kinda done, but not tested AT ALL, and not plumbed in
 3. Allow file ignores (like .gitignore) so we don't get random stuff like .DS_Store sent over the wire. Done at a naive level - good enough for me.
 4. Allow specification of website root in ftp client
 5. Clean up some of the interaction between package level variables, command line flags & viper in cmd/root.go
@@ -31,6 +31,8 @@ hugodeploy minifies html, css, js, json and XML by default prior to deploying. Y
 
 ## Warnings
 FTP username and password are stored in plaintext in the config file. Probably not a good idea to check your config file into a public repository.
+
+Paths currently should be absolute rather than relative to the working directory.
 
 It is designed for web-scale files (i.e. images < 10Mb, HTML, JS, CSS files). Each file is loaded into memory in its entirety before it is processed. Transferring Gb size files probably isn't a good idea with this tool.
 
@@ -76,11 +78,15 @@ hugo push --config 'whydoihavetodothingsthehardway.toml'
 ```
 
 ### sourceDir
+TODO: Currently these should be set as absolute paths.
+
 Specifies the source location of the directory to be deployed to the deployment target. For a typical hugo installation this will be 'public'.
 
 Should generally be set in the config file (sourceDir option), but you can also set on the command-line using --sourceDir or -s. I'm not sure why you want to do that, but I was having fun exploring [cobra](http://github.com/spf13/cobra) & [viper](http://github.com/spf13/viper) so thought I'd put it in.
 
 ### deployRecordDir
+TODO: Currently these should be set as absolute paths.
+
 Specifies the location of the directory used to track what has been deployed. It defaults to 'deployed'.
 
 Should generally be set in the config file (deployRecordDir option), but you can also set on the command-line using --deployRecordDir or -d. 
