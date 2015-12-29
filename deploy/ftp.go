@@ -65,6 +65,7 @@ func (f *FTPDeployer) Initialise() error {
 
 	err := errors.New("") //Must be away to avoid this, but double function returns below barf
 
+	jww.FEEDBACK.Println("Creating FTP connection... ")
 	//Create initial connection
 	if f.ftp, err = goftp.Connect(f.HostID + ":" + f.Port); err != nil {
 		jww.ERROR.Println("Failed initial FTP connection: ", err)

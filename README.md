@@ -2,9 +2,21 @@
 Simple FTP deployment tool for static websites (e.g. created by [Hugo](https://gohugo.io/)) with built-in minification.
 
 ## Why use hugodeploy?
-This was built to allow easy deployment to el-cheapo hosting providers, such as bluehost and namecheap, with no dependencies on third party deployment systems. 
+This was built to allow easy deployment to el-cheapo hosting providers, such as bluehost and namecheap, with no dependencies on third party deployment systems. It keeps a local copy of what has already been deployed and figures out what's different each time it is run so it minimises transfers to your web server.
 
 It was originally written to support the deployment of two or three websites I've been working on, starting with [A Philosopher and A Businessman](http://philosopherbusinessman.com/).
+
+It is totally independent of any code repository - it just needs the output from whatever static site generator you are using and ftp details for where to put it.
+
+## What alternatives are there?
+### SaaS Continuous Deployment
+[This article](http://jice.lavocat.name/blog/2015/hugo-deployment-via-codeship/) talks about using [Codeship](https://codeship.com/), and [this one](https://gohugo.io/tutorials/automated-deployments/) uses [Wercker](http://wercker.com) - both SaaS continous integration and deployment options. I decided against these as there are just more dynamic dependencies to worry about keeping up to date. They do have the advantage that they respond to git commits - i.e. your public site gets updated automatically when you commit changes. 
+
+### Bash scripts
+Again, more dynamic dependencies, plus if I have to write code I'd rather write go.
+
+### Rsync
+Rsync should work ok, but some of the lower cost hosting providers don't support it as well as they should. I wanted to use what works out of the box.
 
 ## How does it work?
 hugodeply keeps a local copy of the latest version of all files successfully sent to to the deployment target. hugodeploy does a binary compare of the file contents ready to deploy with this local copy to determine whether a file needs to be deployed. This is handy where you have images, videos, bloated javascript libraries etc that are slow to send - they only get sent once.
@@ -19,6 +31,13 @@ hugodeploy minifies html, css, js, json and XML by default prior to deploying. Y
 5. Clean up some of the interaction between package level variables, command line flags & viper in cmd/root.go
 6. Possible refactor to push down connection of DeployScanner to appropriate Deployer into deploy package rather than handling in push & preview commands.
 7. Implement directory delete in ftp. This will need to be done in the source library first.
+
+## Installation
+Currently there are no pre-built binaries so you will need go installed. See [https://golang.org](https://golang.org) for instructions.
+Run `go get github.com/mindok/hugodeploy`
+Change directory to $GOPATH/src/github.com/mindok/hugodeply
+Run `go build`
+You should now have a hugodeploy binary that you can put somewhere on your path.
 
 ## Basic Usage (Assuming you are using hugo)
 1. Navigate to the source directory of your website
@@ -36,6 +55,8 @@ FTP username and password are stored in plaintext in the config file. Probably n
 Paths currently should be absolute rather than relative to the working directory.
 
 It is designed for web-scale files (i.e. images < 10Mb, HTML, JS, CSS files). Each file is loaded into memory in its entirety before it is processed. Transferring Gb size files probably isn't a good idea with this tool.
+
+Not tested on any platform other than Mac.
 
 ## Commands
 
@@ -118,10 +139,13 @@ skipfiles:
   - /tmp
 ```
 
-## General mode of operation
+## A few notes on code organisation
 deploy.DeployScanner traverse all files in sourceDir and compares them with what's in deployRecordDir.
 A new DeployCommand is created for each difference between the two containing the details of what needs to be done to update the deployment target.
+
 The DeployCommands thus generated are passed to the selected Deployer (currently only an FTPDeployer) for execution at the deployment target (e.g. creation of a file). Once the DeployCommand has successfully executed it is passed to a FileDeployer to update the deployRecordDir.
+
+Feel free to suggest changes or enhancements, or send PRs for proposed code mods.
 
 ## Credits
 Many thanks to [Steve Francia](http://github.com/spf13) for [hugo](http://github.com/spf13/hugo) - A Fast and Flexible static site generator. It's awesomeness inspired me to cook up this simple deployment tool. Also, thanks for the supporting libraries such as [cobra](http://github.com/spf13/cobra) and [viper](http://github.com/spf13/viper) that made building this a whole lot easier.
