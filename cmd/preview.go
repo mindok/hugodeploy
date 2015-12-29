@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/mindok/hugodeploy/deploy"
 	"github.com/spf13/cobra"
 	jww "github.com/spf13/jwalterweatherman"
@@ -42,7 +40,7 @@ need to be applied and lists those changes.
 
 func previewDeployCommandHandler(cmd *deploy.DeployCommand) error {
 	s := cmd.GetCommandDesc()
-	fmt.Println("Command: ", s, " File\\Dir: ", cmd.RelPath)
+	jww.FEEDBACK.Println("Command: ", s, " : ", cmd.RelPath)
 	return nil
 }
 

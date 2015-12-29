@@ -18,6 +18,7 @@ hugodeploy minifies html, css, js, json and XML by default prior to deploying. Y
 4. Allow specification of website root in ftp client
 5. Clean up some of the interaction between package level variables, command line flags & viper in cmd/root.go
 6. Possible refactor to push down connection of DeployScanner to appropriate Deployer into deploy package rather than handling in push & preview commands.
+7. Implement directory delete in ftp. This will need to be done in the source library first.
 
 ## Basic Usage (Assuming you are using hugo)
 1. Navigate to the source directory of your website
@@ -117,8 +118,12 @@ skipfiles:
   - /tmp
 ```
 
+## General mode of operation
+deploy.DeployScanner traverse all files in sourceDir and compares them with what's in deployRecordDir.
+A new DeployCommand is created for each difference between the two containing the details of what needs to be done to update the deployment target.
+The DeployCommands thus generated are passed to the selected Deployer (currently only an FTPDeployer) for execution at the deployment target (e.g. creation of a file). Once the DeployCommand has successfully executed it is passed to a FileDeployer to update the deployRecordDir.
 
-### Credits
+## Credits
 Many thanks to [Steve Francia](http://github.com/spf13) for [hugo](http://github.com/spf13/hugo) - A Fast and Flexible static site generator. It's awesomeness inspired me to cook up this simple deployment tool. Also, thanks for the supporting libraries such as [cobra](http://github.com/spf13/cobra) and [viper](http://github.com/spf13/viper) that made building this a whole lot easier.
 
 FTP library provided by [DutchCoders-goftp](https://github.com/dutchcoders/goftp)

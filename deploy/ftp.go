@@ -93,7 +93,7 @@ func (f *FTPDeployer) Initialise() error {
 		return err
 	}
 
-	jww.INFO.Println("Successfully connected to FTP")
+	jww.FEEDBACK.Println("Successfully connected to FTP")
 
 	return nil
 
@@ -123,6 +123,7 @@ func (f *FTPDeployer) ApplyCommand(cmd *DeployCommand) error {
 func (f *FTPDeployer) UploadFile(path string, data []byte) error {
 	r := bytes.NewReader(data)
 
+	jww.FEEDBACK.Println("Sending file: ", path, "...")
 	if err := f.ftp.Stor(path, r); err != nil {
 		jww.ERROR.Println("FTP Error uploading file: ", path, err)
 		return err
@@ -146,6 +147,7 @@ func (f *FTPDeployer) RemoveDirectory(path string) error {
 }
 
 func (f *FTPDeployer) RemoveFile(path string) error {
+	jww.FEEDBACK.Println("Deleting file: ", path, "...")
 	if err := f.ftp.Dele(path); err != nil {
 		if strings.Contains(err.Error(), "No such file") {
 			jww.INFO.Println("Looks like FTP file already deleted: ", path)
@@ -161,12 +163,13 @@ func (f *FTPDeployer) RemoveFile(path string) error {
 }
 
 func (f *FTPDeployer) MakeDirectory(path string) error {
+	jww.FEEDBACK.Println("Creating directory: ", path, "...")
 	if err := f.ftp.Mkd(path); err != nil {
-		jww.ERROR.Println("FTP Error creating directory: ", path, err)
 		if strings.Contains(err.Error(), "File exists") {
 			jww.INFO.Println("Looks like FTP directory already exists: ", path)
 			return nil
 		} else {
+			jww.ERROR.Println("FTP Error creating directory: ", path, err)
 			return err
 		}
 	} else {

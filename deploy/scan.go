@@ -153,7 +153,7 @@ func (d *DeployScanner) makeUpdateFileCmd(src string, data []byte) *DeployComman
 // sync updates dst to match with src, handling both files and directories.
 func (d *DeployScanner) sync(dst, src string) {
 
-	jww.INFO.Println("Comparing Dst: ", dst, " With Src: ", src)
+	jww.FEEDBACK.Println("Comparing Dst: ", dst, " With Src: ", src)
 
 	//Build a map of all files so we can figure out what to delete at the end
 	srcFiles := make(map[string]os.FileInfo)
@@ -162,10 +162,10 @@ func (d *DeployScanner) sync(dst, src string) {
 
 	var scan = func(path string, fileInfo os.FileInfo, inpErr error) (err error) {
 		jww.TRACE.Println("Scanning: ", path)
-		if fileInfo.IsDir() && d.shouldSkip(path) {
-			jww.INFO.Println("Skipping directory ", path)
-			return filepath.SkipDir
-		}
+		//if fileInfo.IsDir() && d.shouldSkip(path) {
+		//	jww.INFO.Println("Skipping directory ", path)
+		//	return filepath.SkipDir
+		//}
 		if inpErr == nil {
 			srcFiles[path] = fileInfo
 			srcFileKeys = append(srcFileKeys, path)
@@ -175,6 +175,7 @@ func (d *DeployScanner) sync(dst, src string) {
 
 	err := filepath.Walk(src, scan)
 	check(err)
+	jww.WARN.Println(srcFileKeys)
 
 	//jww.TRACE.Println(srcFileKeys)
 
@@ -188,7 +189,7 @@ func (d *DeployScanner) sync(dst, src string) {
 	//  If destination file exists, but is different, update it
 	for _, srcFile := range srcFileKeys {
 		if d.shouldSkip(srcFile) {
-			jww.INFO.Println("Skipping file ", srcFile)
+			jww.FEEDBACK.Println("Skipping ", srcFile)
 		} else {
 			//TODO: May be a bit of a naive approach to figure out path to destination file
 			dstFile := strings.Replace(srcFile, src, dst, 1)
@@ -255,10 +256,6 @@ func (d *DeployScanner) sync(dst, src string) {
 		//jww.INFO.Println("Scanning: ", path)
 		if inpErr == nil {
 			srcFileExpected := strings.Replace(path, dst, src, 1)
-			if fileInfo.IsDir() && d.shouldSkip(path) {
-				jww.INFO.Println("Skipping ", path)
-				return filepath.SkipDir
-			}
 			jww.TRACE.Println("Checking to deleted: ", path, ". Looking for: ", srcFileExpected)
 			_, err := os.Stat(srcFileExpected)
 			if err != nil && os.IsNotExist(err) && !d.shouldSkip(path) {
@@ -280,9 +277,15 @@ func (d *DeployScanner) sync(dst, src string) {
 	check(err)
 
 	for i := len(dstDeleteFiles) - 1; i >= 0; i-- {
+		if d.shouldSkip(dstDeleteFiles[i]) {
+			jww.FEEDBACK.Println("Skipping ", dstDeleteFiles[i])
+		}
 		check(d.handleFunc(d.makeDeleteFileCmd(dstDeleteFiles[i])))
 	}
 	for i := len(dstDeleteDirs) - 1; i >= 0; i-- {
+		if d.shouldSkip(dstDeleteDirs[i]) {
+			jww.FEEDBACK.Println("Skipping ", dstDeleteDirs[i])
+		}
 		check(d.handleFunc(d.makeDeleteDirCmd(dstDeleteDirs[i])))
 	}
 }
