@@ -1,4 +1,4 @@
-// Copyright © 2015 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2015 Philosopher Businessman abp@philosopherbusinessman.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 )
 
@@ -38,9 +39,9 @@ By default HugoDeploy minifies files prior to transfer.
 HugoDeploy requires a configuration file to nominate directories and
 setup server connection details. By default the configuration file is
 expected in the directory HugoDeploy is executed from.`,
-// Uncomment the following line if your bare application
-// has an action associated with it:
-//	Run: func(cmd *cobra.Command, args []string) { },
+	// Uncomment the following line if your bare application
+	// has an action associated with it:
+	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -60,11 +61,13 @@ func init() {
 }
 
 var CfgFile, Source, Deploy string
-var Verbose, UnMinify bool
+var Verbose, Debug, UnMinify bool
+var SkipFiles []string
 
 func initCoreCommonFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&CfgFile, "config", "", "config file (default is path/hugodeploy.yaml|json|toml)")
 	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+	cmd.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "debug trace output")
 	//cmd.PersistentFlags().BoolVar(&Logging, "log", false, "Enable Logging")
 	//cmd.PersistentFlags().StringVar(&LogFile, "logFile", "", "Log File path (if set, logging enabled automatically)")
 	//cmd.PersistentFlags().BoolVar(&VerboseLog, "verboseLog", false, "verbose logging")
@@ -79,6 +82,8 @@ func LoadDefaultSettings() {
 	viper.SetDefault("deployRecordDir", "deployed")
 	viper.SetDefault("dontminify", false)
 	viper.SetDefault("verbose", false)
+	viper.SetDefault("debug", false)
+	viper.SetDefault("skipfiles", []string{".git*", ".DS_Store"})
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -89,9 +94,9 @@ func initConfig() {
 	}
 
 	viper.SetConfigName("hugodeploy") // name of config file (without extension)
-	viper.AddConfigPath(".")  // adding cwd directory as first search path
+	viper.AddConfigPath(".")          // adding cwd directory as first search path
 	//viper.AddConfigPath("/Users/johnjessop/Documents/Code/GoCode/src/github.com/mindok/hugodeploy")
-	viper.AutomaticEnv()          // read in environment variables that match
+	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 
@@ -99,13 +104,16 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	} else {
 		fmt.Println("Error: No valid config file found. ", err)
-		os.Exit(-1)
+		//os.Exit(-1)
 	}
 
 	LoadDefaultSettings()
 
 	if RootCmd.PersistentFlags().Lookup("verbose").Changed {
 		viper.Set("Verbose", Verbose)
+	}
+	if RootCmd.PersistentFlags().Lookup("debug").Changed {
+		viper.Set("Debug", Debug)
 	}
 	if RootCmd.PersistentFlags().Lookup("dontminify").Changed {
 		viper.Set("DontMinify", UnMinify)
@@ -117,12 +125,47 @@ func initConfig() {
 		viper.Set("deployRecordDir", Deploy)
 	}
 
-	for _, x := range viper.AllKeys() {
-		fmt.Println(x, ":")
-		if viper.IsSet(x) {
-			fmt.Println("  ", viper.Get(x))
-		}
-	} 
+	if viper.GetBool("verbose") {
+		//TODO: Maybe have additional flag for verbose v. debug tracing
+		jww.SetStdoutThreshold(jww.LevelInfo)
+	}
+	if viper.GetBool("debug") {
+		jww.SetStdoutThreshold(jww.LevelTrace)
+	}
 
-	fmt.Println(viper.Get("ftp.host"))
+	SkipFiles = viper.GetStringSlice("skipfiles")
+
+	jww.INFO.Println("Listing Config:")
+	for _, x := range viper.AllKeys() {
+		jww.INFO.Println(x, ":", viper.Get(x))
+	}
+
+}
+
+func checkSourcePath() {
+	//TODO: Need to do some fancy path fixing for relative paths etc
+	Source = viper.GetString("sourceDir")
+	jww.INFO.Println("Checking Source Dir exists: ", Source)
+	b, err := exists(Source)
+	if err != nil {
+		er(err)
+	}
+	if !b {
+		jww.CRITICAL.Println("Source Dir does not exist", Source)
+		os.Exit(-1)
+	}
+}
+
+// Only needs to be checked when we are not init-ing
+func checkDeployPath() {
+	Deploy = viper.GetString("deployRecordDir")
+	jww.INFO.Println("Checking Deploy Dir exists: ", Deploy)
+	b, err := exists(Deploy)
+	if err != nil {
+		er(err)
+	}
+	if !b {
+		jww.CRITICAL.Println("Deploy Dir does not exist", Deploy)
+		os.Exit(-1)
+	}
 }

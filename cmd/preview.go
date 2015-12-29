@@ -1,4 +1,4 @@
-// Copyright © 2015 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2015 Philosopher Businessman abp@philosopherbusinessman.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/mindok/hugodeploy/deploy"
 	"github.com/spf13/cobra"
+	jww "github.com/spf13/jwalterweatherman"
 )
 
 // compareCmd represents the preview command
@@ -29,22 +31,21 @@ Preview uses the same comparison algorithms as push to determine what changes
 need to be applied and lists those changes.
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("preview called")
+		checkSourcePath()
+		jww.INFO.Println("Preview: Source Dir Good: ", Source)
+		checkDeployPath()
+		jww.INFO.Println("Preview: Deploy Record Dir Good: ", Deploy)
+
+		deploy.DeployChanges(Source, Deploy, !UnMinify, previewDeployCommandHandler, SkipFiles)
 	},
+}
+
+func previewDeployCommandHandler(cmd *deploy.DeployCommand) error {
+	s := cmd.GetCommandDesc()
+	fmt.Println("Command: ", s, " File\\Dir: ", cmd.RelPath)
+	return nil
 }
 
 func init() {
 	RootCmd.AddCommand(compareCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// compareCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// compareCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 }
