@@ -93,8 +93,7 @@ func (s *SFTPDeployer) Initialise() error {
 }
 
 func (s *SFTPDeployer) ApplyCommand(cmd *DeployCommand) error {
-	//jww.WARN.Println("SFTP Cmds not implemented yet: ", cmd.RelPath)
-	return nil
+	return errors.New("SFTP Cms not implemented yet")
 }
 
 func (s *SFTPDeployer) Cleanup() error {

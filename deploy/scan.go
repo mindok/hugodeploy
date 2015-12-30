@@ -162,10 +162,6 @@ func (d *DeployScanner) sync(dst, src string) {
 
 	var scan = func(path string, fileInfo os.FileInfo, inpErr error) (err error) {
 		jww.TRACE.Println("Scanning: ", path)
-		//if fileInfo.IsDir() && d.shouldSkip(path) {
-		//	jww.INFO.Println("Skipping directory ", path)
-		//	return filepath.SkipDir
-		//}
 		if inpErr == nil {
 			srcFiles[path] = fileInfo
 			srcFileKeys = append(srcFileKeys, path)
@@ -176,8 +172,6 @@ func (d *DeployScanner) sync(dst, src string) {
 	err := filepath.Walk(src, scan)
 	check(err)
 	jww.WARN.Println(srcFileKeys)
-
-	//jww.TRACE.Println(srcFileKeys)
 
 	//For each source file entry
 	// If a directory
@@ -253,7 +247,6 @@ func (d *DeployScanner) sync(dst, src string) {
 	dstDeleteFiles := make([]string, 0)
 	dstDeleteDirs := make([]string, 0)
 	var scanDeletes = func(path string, fileInfo os.FileInfo, inpErr error) (err error) {
-		//jww.INFO.Println("Scanning: ", path)
 		if inpErr == nil {
 			srcFileExpected := strings.Replace(path, dst, src, 1)
 			jww.TRACE.Println("Checking to deleted: ", path, ". Looking for: ", srcFileExpected)
@@ -341,7 +334,6 @@ func (d *DeployScanner) filesEqual(src, dst string, srcdata []byte) bool {
 	check(err)
 
 	return bytes.Equal(contents, srcdata)
-
 }
 
 func checkDirExists(path, name string) error {

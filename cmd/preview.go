@@ -39,8 +39,7 @@ need to be applied and lists those changes.
 }
 
 func previewDeployCommandHandler(cmd *deploy.DeployCommand) error {
-	s := cmd.GetCommandDesc()
-	jww.FEEDBACK.Println("Command: ", s, " : ", cmd.RelPath)
+	jww.FEEDBACK.Println("Command: ", cmd.GetCommandDesc(), " : ", cmd.RelPath)
 	return nil
 }
 
