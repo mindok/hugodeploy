@@ -187,6 +187,7 @@ ftp:
   port: <enter port - usually 21 for FTP over TLS>
   user: <enter user id>
   pwd: <enter password>
+  rootdir: <enter root directory of website, e.g. /public_html/>
 
 # Connection settings for deployment target (SFTP only)
 sftp: 
@@ -194,6 +195,7 @@ sftp:
   port: <enter port - usually 22 for SSH>
   user: <enter user id>
   pwd: <enter password>
+  rootdir: <enter root directory of website, e.g. /public_html/>
 
 # Location of files to publish. For hugo static sites this is PublishDir and defaults to public
 sourcedir: public

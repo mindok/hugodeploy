@@ -27,7 +27,7 @@ hugodeploy minifies html, css, js, json and XML by default prior to deploying. Y
 1. Fix up path handling for directories so they can be relative to working directory rather than absolute
 2. Modify ftp invocation infrastructure so it is substituable with another deployment method (e.g. sftp, scp). sftp is kinda done, but not tested AT ALL, and not plumbed in
 3. Allow file ignores (like .gitignore) so we don't get random stuff like .DS_Store sent over the wire. Done at a naive level - good enough for me.
-4. Allow specification of website root in ftp client
+4. <del>Allow specification of website root in ftp client</del> DONE
 5. Clean up some of the interaction between package level variables, command line flags & viper in cmd/root.go
 6. Possible refactor to push down connection of DeployScanner to appropriate Deployer into deploy package rather than handling in push & preview commands.
 7. Implement directory delete in ftp. This will need to be done in the source library first.
@@ -116,17 +116,18 @@ Should generally be set in the config file (deployRecordDir option), but you can
 ### DontMinify Option
 Disables minification. Can be set in the config file (DontMinify), or on the command-line. Command flags are -m or --dontminify.
 
-Note that changing this is likely to cause all minifiable files (HTML, CSS etc) to be resent as the file compare with what was previously sent is done post-minification.
+Note that changing this is likely to cause all minifiable files (HTML, CSS etc) to be resent as the file compare operates with what was previously sent, and is done post-minification.
 
 Minification is performed by the [tdewolff/minify](https://github.com/tdewolff/minify) library.
 
 ### FTP Options
-Sets the host, username and password for the SFTP deployment target. Can only be set in the config file as follows:
+Sets the host, username, password and root directory for the FTP deployment target. Can only be set in the config file as follows:
 ```
 ftp: 
   host: <host ip or name>
   user: <username>
   pwd: <password>
+  rootdir: <root directory of website relative to root of ftp server. e.g. / or /public_html/ >
 ```
 Note that if you are using YAML, the indent between ftp & host is 2 spaces, not a tab. 
 

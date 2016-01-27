@@ -21,15 +21,17 @@ import (
 	"github.com/dutchcoders/goftp"
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
+	"path"
 	"strings"
 )
 
 type FTPDeployer struct {
-	HostID string
-	Port   string
-	UID    string
-	PWD    string
-	ftp    *goftp.FTP
+	HostID  string
+	Port    string
+	UID     string
+	PWD     string
+	RootDir string
+	ftp     *goftp.FTP
 }
 
 func (f *FTPDeployer) GetName() string {
@@ -44,7 +46,8 @@ func (f *FTPDeployer) Initialise() error {
 	f.Port = viper.GetString("ftp.port")
 	f.UID = viper.GetString("ftp.user")
 	f.PWD = viper.GetString("ftp.pwd")
-	jww.INFO.Println("Got FTP settings: ", f.HostID, f.Port, f.UID)
+	f.RootDir = viper.GetString("ftp.rootdir")
+	jww.INFO.Println("Got FTP settings: ", f.HostID, f.Port, f.UID, f.RootDir)
 
 	if f.HostID == "" {
 		serr = serr + "HostID not found. Define ftp.host in config file. "
@@ -57,6 +60,10 @@ func (f *FTPDeployer) Initialise() error {
 	}
 	if f.PWD == "" {
 		serr = serr + "PWD not found. Define ftp.pwd in config file. "
+	}
+	if f.RootDir == "" {
+		f.RootDir = "/"
+		jww.WARN.Println("FTP: Website root directory not found (ftp: rootdir in config). Defaulting to '/'")
 	}
 
 	if serr != "" {
@@ -88,12 +95,6 @@ func (f *FTPDeployer) Initialise() error {
 		return err
 	}
 
-	//TODO: Assume everything is relative to root...
-	if err = f.ftp.Cwd("/"); err != nil {
-		jww.ERROR.Println("Failed to change to root directory: ", err)
-		return err
-	}
-
 	jww.FEEDBACK.Println("Successfully connected to FTP")
 
 	return nil
@@ -101,18 +102,19 @@ func (f *FTPDeployer) Initialise() error {
 }
 
 func (f *FTPDeployer) ApplyCommand(cmd *DeployCommand) error {
+	p := path.Join(f.RootDir, cmd.RelPath)
 	switch cmd.Command {
 	case COMMAND_FILE_ADD, COMMAND_FILE_UPD:
-		return f.UploadFile(cmd.RelPath, cmd.Contents)
+		return f.UploadFile(p, cmd.Contents)
 
 	case COMMAND_DIR_ADD:
-		return f.MakeDirectory(cmd.RelPath)
+		return f.MakeDirectory(p)
 
 	case COMMAND_DIR_DEL:
-		return f.RemoveDirectory(cmd.RelPath)
+		return f.RemoveDirectory(p)
 
 	case COMMAND_FILE_DEL:
-		return f.RemoveFile(cmd.RelPath)
+		return f.RemoveFile(p)
 
 	default:
 		return errors.New("Not implemented")
