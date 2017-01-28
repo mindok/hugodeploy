@@ -70,7 +70,7 @@ func (f *FTPDeployer) Initialise() error {
 		return errors.New("Error initialising FTP Deployer. " + serr)
 	}
 
-	err := errors.New("") //Must be away to avoid this, but double function returns below barf
+	var err error 
 
 	jww.FEEDBACK.Println("Creating FTP connection... ")
 	//Create initial connection
@@ -120,15 +120,15 @@ func (f *FTPDeployer) ApplyCommand(cmd *DeployCommand) error {
 		return errors.New("Not implemented")
 	}
 	//jww.WARN.Println("SFTP Cmds not implemented yet: ", cmd.RelPath)
-	return nil
 }
 
 func (f *FTPDeployer) UploadFile(path string, data []byte) error {
 	r := bytes.NewReader(data)
-
 	jww.FEEDBACK.Println("Sending file: ", path, "...")
+	jww.DEBUG.Println("Data Size: ", len(data))
 	if err := f.ftp.Stor(path, r); err != nil {
 		jww.ERROR.Println("FTP Error uploading file: ", path, err)
+		jww.DEBUG.Println("Data that could not be sent: ", data)
 		return err
 	} else {
 		jww.INFO.Println("Successfully FTP'd file: ", path)

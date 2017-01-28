@@ -31,7 +31,7 @@ var RootCmd = &cobra.Command{
 transfers those changes to a remote server. Currently the transfer
 is done using SFTP.
 
-HugoDeploy can generate a list of changed files using the preview 
+HugoDeploy can generate a list of changed files using the preview
 command and does the actual transfer using the push command.
 
 By default HugoDeploy minifies files prior to transfer.

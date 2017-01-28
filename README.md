@@ -10,7 +10,7 @@ It is totally independent of any code repository - it just needs the output from
 
 ## What alternatives are there?
 ### SaaS Continuous Deployment
-[This article](http://jice.lavocat.name/blog/2015/hugo-deployment-via-codeship/) talks about using [Codeship](https://codeship.com/), and [this one](https://gohugo.io/tutorials/automated-deployments/) uses [Wercker](http://wercker.com) - both SaaS continous integration and deployment options. I decided against these as there are just more dynamic dependencies to worry about keeping up to date. They do have the advantage that they respond to git commits - i.e. your public site gets updated automatically when you commit changes. 
+[This article](http://jice.lavocat.name/blog/2015/hugo-deployment-via-codeship/) talks about using [Codeship](https://codeship.com/), and [this one](https://gohugo.io/tutorials/automated-deployments/) uses [Wercker](http://wercker.com) - both SaaS continous integration and deployment options. I decided against these as there are just more dynamic dependencies to worry about keeping up to date. They do have the advantage that they respond to git commits - i.e. your public site gets updated automatically when you commit changes.
 
 ### Bash scripts
 Again, more dynamic dependencies, plus if I have to write code I'd rather write go.
@@ -21,11 +21,11 @@ Rsync should work ok, but some of the lower cost hosting providers don't support
 ## How does it work?
 hugodeply keeps a local copy of the latest version of all files successfully sent to to the deployment target. hugodeploy does a binary compare of the file contents ready to deploy with this local copy to determine whether a file needs to be deployed. This is handy where you have images, videos, bloated javascript libraries etc that are slow to send - they only get sent once.
 
-hugodeploy minifies html, css, js, json and XML by default prior to deploying. You can disable this using the DontMinify option in the config file or the -m flag. 
+hugodeploy minifies html, css, js, json and XML by default prior to deploying. You can disable this using the DontMinify option in the config file or the -m flag.
 
 ## TODOs
 1. Fix up path handling for directories so they can be relative to working directory rather than absolute
-2. Modify ftp invocation infrastructure so it is substituable with another deployment method (e.g. sftp, scp). sftp is kinda done, but not tested AT ALL, and not plumbed in
+2. Modify ftp invocation infrastructure so it is substitutable with another deployment method (e.g. sftp, scp). sftp is kinda done, but not tested AT ALL, and not plumbed in
 3. Allow file ignores (like .gitignore) so we don't get random stuff like .DS_Store sent over the wire. Done at a naive level - good enough for me.
 4. <del>Allow specification of website root in ftp client</del> DONE
 5. Clean up some of the interaction between package level variables, command line flags & viper in cmd/root.go
@@ -111,7 +111,7 @@ TODO: Currently these should be set as absolute paths.
 
 Specifies the location of the directory used to track what has been deployed. It defaults to 'deployed'.
 
-Should generally be set in the config file (deployRecordDir option), but you can also set on the command-line using --deployRecordDir or -d. 
+Should generally be set in the config file (deployRecordDir option), but you can also set on the command-line using --deployRecordDir or -d.
 
 ### DontMinify Option
 Disables minification. Can be set in the config file (DontMinify), or on the command-line. Command flags are -m or --dontminify.
@@ -123,13 +123,13 @@ Minification is performed by the [tdewolff/minify](https://github.com/tdewolff/m
 ### FTP Options
 Sets the host, username, password and root directory for the FTP deployment target. Can only be set in the config file as follows:
 ```
-ftp: 
+ftp:
   host: <host ip or name>
   user: <username>
   pwd: <password>
   rootdir: <root directory of website relative to root of ftp server. e.g. / or /public_html/ >
 ```
-Note that if you are using YAML, the indent between ftp & host is 2 spaces, not a tab. 
+Note that if you are using YAML, the indent between ftp & host is 2 spaces, not a tab.
 
 ### Skipping files
 There is a naive file and directory skipping capability that currently just does a simple string.Contains test. Substrings matched are set in the SkipFiles section of the config file as follows:
@@ -157,5 +157,3 @@ FTP library provided by [DutchCoders-goftp](https://github.com/dutchcoders/goftp
 SFTP library provided by [pkg](https://github.com/pkg/sftp). (Not implemented as yet)
 
 Minification library from [tdewolff](https://github.com/tdewolff/minify).
-
-

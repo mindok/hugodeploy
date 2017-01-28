@@ -171,7 +171,7 @@ func (d *DeployScanner) sync(dst, src string) {
 
 	err := filepath.Walk(src, scan)
 	check(err)
-	jww.WARN.Println(srcFileKeys)
+	//jww.WARN.Println(srcFileKeys)
 
 	//For each source file entry
 	// If a directory
@@ -285,12 +285,14 @@ func (d *DeployScanner) sync(dst, src string) {
 
 func (d *DeployScanner) getSourceData(src string) ([]byte, error) {
 	contents, err := ioutil.ReadFile(src)
+	jww.DEBUG.Println("getSourceData step 1: ", len(contents), " bytes read from: ", src)
 	check(err)
 	if d.minify {
 		mediatype := getMediaType(src)
 		jww.DEBUG.Println("Minifier media type ", mediatype, " for ", src)
 		if mediatype != "" {
 			contents, err = d.minifier.Bytes(mediatype, contents)
+			jww.DEBUG.Println("getSourceData step 2: ", len(contents), " bytes when minified: ", src)
 			check(err)
 		}
 	}
