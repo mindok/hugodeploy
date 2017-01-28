@@ -68,7 +68,7 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// pushCmd.PersistentFlags().String("foo", "", "A help for foo")
+	pushCmd.PersistentFlags().String("ftppwd", "", "FTP Password. Avoids having to set it in config file")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

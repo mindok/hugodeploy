@@ -26,7 +26,7 @@ import (
 )
 
 // initCmd represents the init command
-var initCmd = &cobra.Command{
+var initCmd = &cobra.Command {
 	Use:   "init",
 	Short: "Initialises the setup",
 	Long: `Initialises the setup by:
@@ -182,7 +182,7 @@ func createConfigFile() {
 # HugoDeploy Configuration File
 
 # Connection settings for deployment target (FTP only)
-ftp: 
+ftp:
   host: <enter host id / ip address>
   port: <enter port - usually 21 for FTP over TLS>
   user: <enter user id>
@@ -190,7 +190,7 @@ ftp:
   rootdir: <enter root directory of website, e.g. /public_html/>
 
 # Connection settings for deployment target (SFTP only)
-sftp: 
+sftp:
   host: <enter host id / ip address>
   port: <enter port - usually 22 for SSH>
   user: <enter user id>

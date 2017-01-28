@@ -85,7 +85,7 @@ func (f *FTPDeployer) Initialise() error {
 		ClientAuth:         tls.RequestClientCert,
 	}
 
-	if err = f.ftp.AuthTLS(config); err != nil {
+	if err = f.ftp.AuthTLS(&config); err != nil {
 		jww.ERROR.Println("Failed TLS Activation: ", err)
 		return err
 	}

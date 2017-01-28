@@ -43,7 +43,7 @@ You should now have a hugodeploy binary that you can put somewhere on your path.
 1. Navigate to the source directory of your website
 2. Run `hugodeploy init` in the source directory of your hugo website.
 3. This will create a hugodeploy.yaml (if one doesn't exist) file in that directory with some sensible defaults.
-4. Edit hugodeploy.yaml, in particular to set up your sftp host, username and password. Most other options should be ok. If you want to specify a directory for tracking the deployed files you can the deployRecordDir and create that directory manually. Otherwise...
+4. Edit hugodeploy.yaml, in particular to set up your ftp host, username and password. Most other options should be ok. If you want to specify a directory for tracking the deployed files you can the deployRecordDir and create that directory manually. Otherwise...
 5. [Optional] Run `hugodeploy init` again. This will now create a tracking directory (Deployment Record Directory) for storing a copy of what's on your server.
 6. Run `hugodeploy preview` to see a list of what will be sent to your deployment target
 7. Run `hugodeploy push` to upload files to your deployment target
@@ -157,4 +157,5 @@ FTP library provided by [DutchCoders-goftp](https://github.com/dutchcoders/goftp
 SFTP library provided by [pkg](https://github.com/pkg/sftp). (Not implemented as yet)
 
 Minification library from [tdewolff](https://github.com/tdewolff/minify).
+
 
