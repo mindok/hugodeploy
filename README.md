@@ -19,7 +19,7 @@ Again, more dynamic dependencies, plus if I have to write code I'd rather write 
 Rsync should work ok, but some of the lower cost hosting providers don't support it as well as they should. I wanted to use what works out of the box.
 
 ## How does it work?
-hugodeply keeps a local copy of the latest version of all files successfully sent to to the deployment target. hugodeploy does a binary compare of the file contents ready to deploy with this local copy to determine whether a file needs to be deployed. This is handy where you have images, videos, bloated javascript libraries etc that are slow to send - they only get sent once.
+hugodeploy keeps a local copy of the latest version of all files successfully sent to to the deployment target. hugodeploy does a binary compare of the file contents ready to deploy with this local copy to determine whether a file needs to be deployed. This is handy where you have images, videos, bloated javascript libraries etc that are slow to send - they only get sent once.
 
 hugodeploy minifies html, css, js, json and XML by default prior to deploying. You can disable this using the DontMinify option in the config file or the -m flag.
 
@@ -35,7 +35,7 @@ hugodeploy minifies html, css, js, json and XML by default prior to deploying. Y
 ## Installation
 Currently there are no pre-built binaries so you will need go installed. See [https://golang.org](https://golang.org) for instructions.
 Run `go get github.com/mindok/hugodeploy`
-Change directory to $GOPATH/src/github.com/mindok/hugodeply
+Change directory to $GOPATH/src/github.com/mindok/hugodeploy
 Run `go build`
 You should now have a hugodeploy binary that you can put somewhere on your path.
 
@@ -62,7 +62,7 @@ Not tested on any platform other than Mac.
 
 ### init
 ```bash
-hugodeply init [flags]
+hugodeploy init [flags]
 ```
 Initialises the configuration file if one doesn't exist.
 
@@ -74,7 +74,7 @@ Run `hugo init -h` or `hugo init --help` for information on available flags
 
 ### preview
 ```bash
-hugodeply preview [flags]
+hugodeploy preview [flags]
 ```
 Generates a list of deployment actions based on differences between sourceDir and deploymentRecordDir (and whether minification is disabled or not).
 
@@ -82,17 +82,17 @@ Run `hugo preview -h` or `hugo preview --help` for information on available flag
 
 ### push
 ```bash
-hugodeply push [flags]
+hugodeploy push [flags]
 ```
 Performs deployment actions based on differences between sourceDir and deploymentRecordDir (and whether minification is disabled or not).
 
 Run `hugo push -h` or `hugo push --help` for information on available flags
 
 ## Options
-Life is easier if you set all the options in the config file, call the config file hugodeply.yaml and place it in the source directory for your hugo website. Then set the current working directory to the source directory for your hugo website before running the commands. However, if you want a little more control here are the available options
+Life is easier if you set all the options in the config file, call the config file hugodeploy.yaml and place it in the source directory for your hugo website. Then set the current working directory to the source directory for your hugo website before running the commands. However, if you want a little more control here are the available options
 
 ### ConfigFile
-Specifies the location of the configuration file. By default hugodeploy looks for a file called hugodeply.xxx in the current working directory, where xxx indicates a format supported by [viper](http://github.com/spf13/viper) - currently JSON, TOML, YAML and HCL.
+Specifies the location of the configuration file. By default hugodeploy looks for a file called hugodeploy.xxx in the current working directory, where xxx indicates a format supported by [viper](http://github.com/spf13/viper) - currently JSON, TOML, YAML and HCL.
 
 You can override the name and location of the config file using the --config flag. e.g.
 ```bash
