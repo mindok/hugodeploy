@@ -94,7 +94,7 @@ Life is easier if you set all the options in the config file, call the config fi
 ### ConfigFile
 Specifies the location of the configuration file. By default hugodeploy looks for a file called hugodeploy.xxx in the current working directory, where xxx indicates a format supported by [viper](http://github.com/spf13/viper) - currently JSON, TOML, YAML and HCL.
 
-**Note for TOML config files** Global settings (e.g. sourcedir, deployRecordDir) need to be at the top, above grouped settings such as ftp. This is a [limitation of TOML](https://npf.io/2014/08/intro-to-toml/). Thanks to [Hernán](https://github.com/hfoffani) for finding that one.
+**Note for TOML config files:** Global settings (e.g. sourcedir, deployRecordDir) need to be at the top, above grouped settings such as ftp. This is a [limitation of TOML](https://npf.io/2014/08/intro-to-toml/). Thanks to [Hernán](https://github.com/hfoffani) for finding that one.
 
 
 You can override the name and location of the config file using the --config flag. e.g.

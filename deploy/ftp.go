@@ -69,7 +69,8 @@ func (f *FTPDeployer) Initialise() error {
 	}
 
 	if serr != "" {
-		return errors.New("Error initialising FTP Deployer. " + serr)
+		jww.ERROR.Println("Error initialising FTP Deployer: ", serr)
+		panic(errors.New("Error initialising FTP Deployer. " + serr))
 	}
 
 	var err error
