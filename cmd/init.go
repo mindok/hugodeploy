@@ -26,7 +26,7 @@ import (
 )
 
 // initCmd represents the init command
-var initCmd = &cobra.Command {
+var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialises the setup",
 	Long: `Initialises the setup by:
@@ -198,7 +198,7 @@ sftp:
   rootdir: <enter root directory of website, e.g. /public_html/>
 
 # Location of files to publish. For hugo static sites this is PublishDir and defaults to public
-sourcedir: public
+sourcedir: published
 
 # Skip files or directories which match the following patterns
 skipfiles:

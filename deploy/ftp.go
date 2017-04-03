@@ -18,11 +18,12 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
+	"path"
+	"strings"
+
 	"github.com/dutchcoders/goftp"
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
-	"path"
-	"strings"
 )
 
 type FTPDeployer struct {
@@ -47,6 +48,7 @@ func (f *FTPDeployer) Initialise() error {
 	f.UID = viper.GetString("ftp.user")
 	f.PWD = viper.GetString("ftp.pwd")
 	f.RootDir = viper.GetString("ftp.rootdir")
+
 	jww.INFO.Println("Got FTP settings: ", f.HostID, f.Port, f.UID, f.RootDir)
 
 	if f.HostID == "" {
@@ -70,13 +72,21 @@ func (f *FTPDeployer) Initialise() error {
 		return errors.New("Error initialising FTP Deployer. " + serr)
 	}
 
-	var err error 
+	var err error
 
 	jww.FEEDBACK.Println("Creating FTP connection... ")
 	//Create initial connection
-	if f.ftp, err = goftp.Connect(f.HostID + ":" + f.Port); err != nil {
-		jww.ERROR.Println("Failed initial FTP connection: ", err)
-		return err
+	if !viper.GetBool("debug") && !viper.GetBool("verbose") {
+		if f.ftp, err = goftp.Connect(f.HostID + ":" + f.Port); err != nil {
+			jww.ERROR.Println("Failed initial FTP connection: ", err)
+			return err
+		}
+	} else {
+		jww.INFO.Println("Connecting to ftp in debug mode")
+		if f.ftp, err = goftp.ConnectDbg(f.HostID + ":" + f.Port); err != nil {
+			jww.ERROR.Println("Failed initial FTP connection: ", err)
+			return err
+		}
 	}
 
 	//Activate TLS

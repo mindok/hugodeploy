@@ -9,6 +9,8 @@ hugodeploy
 # Config file
 hugodeploy.yaml
 
+hugodeploy.works.*
+
 # Folders
 _obj
 _test
