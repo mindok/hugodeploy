@@ -36,8 +36,12 @@ to quickly create a Cobra application.`,
 		checkDeployPath()
 		jww.INFO.Println("Push: Deploy Record Dir Good: ", Deploy)
 
+		var err error
+
 		ftpDeployer = &deploy.FTPDeployer{}
-		ftpDeployer.Initialise()
+		if err = ftpDeployer.Initialise(); err != nil {
+			panic(err)
+		}
 
 		deployRecorder = &deploy.FileDeployer{Deploy}
 		deployRecorder.Initialise()

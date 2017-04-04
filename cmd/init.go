@@ -188,6 +188,7 @@ ftp:
   user: <enter user id>
   pwd: <enter password>
   rootdir: <enter root directory of website, e.g. /public_html/>
+	disabletls: false
 
 # Connection settings for deployment target (SFTP only)
 sftp:

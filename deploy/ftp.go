@@ -27,12 +27,13 @@ import (
 )
 
 type FTPDeployer struct {
-	HostID  string
-	Port    string
-	UID     string
-	PWD     string
-	RootDir string
-	ftp     *goftp.FTP
+	HostID     string
+	Port       string
+	UID        string
+	PWD        string
+	RootDir    string
+	DisableTLS bool
+	ftp        *goftp.FTP
 }
 
 func (f *FTPDeployer) GetName() string {
@@ -48,6 +49,10 @@ func (f *FTPDeployer) Initialise() error {
 	f.UID = viper.GetString("ftp.user")
 	f.PWD = viper.GetString("ftp.pwd")
 	f.RootDir = viper.GetString("ftp.rootdir")
+	f.DisableTLS = false
+	if viper.IsSet("ftp.disabletls") {
+		f.DisableTLS = viper.GetBool("ftp.disabletls")
+	}
 
 	jww.INFO.Println("Got FTP settings: ", f.HostID, f.Port, f.UID, f.RootDir)
 
@@ -91,14 +96,18 @@ func (f *FTPDeployer) Initialise() error {
 	}
 
 	//Activate TLS
-	config := tls.Config{
-		InsecureSkipVerify: true,
-		ClientAuth:         tls.RequestClientCert,
-	}
+	if !f.DisableTLS {
+		config := tls.Config{
+			InsecureSkipVerify: true,
+			ClientAuth:         tls.RequestClientCert,
+		}
 
-	if err = f.ftp.AuthTLS(&config); err != nil {
-		jww.ERROR.Println("Failed TLS Activation: ", err)
-		return err
+		if err = f.ftp.AuthTLS(&config); err != nil {
+			jww.ERROR.Println("Failed TLS Activation: ", err)
+			return err
+		}
+	} else {
+		jww.WARN.Println("FTP TLS disabled - data will be transmitted in clear text")
 	}
 
 	if err = f.ftp.Login(f.UID, f.PWD); err != nil {

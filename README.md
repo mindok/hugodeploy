@@ -131,6 +131,7 @@ ftp:
   user: <username>
   pwd: <password>
   rootdir: <root directory of website relative to root of ftp server. e.g. / or /public_html/ >
+  disabletls: <optional. Should be false unless troubleshooting, or if your ftp server is known not to support TLS.>
 ```
 Note that if you are using YAML, the indent between ftp & host is 2 spaces, not a tab.
 
@@ -142,6 +143,15 @@ skipfiles:
   - .git
   - /tmp
 ```
+
+### Troubleshooting FTP connections
+Most problems with hugodeploy are related to FTP connections and the widely differing implementation of the FTP specification in different servers. 
+
+The first thing to try is disabling TLS. This is generally a bad idea as your password and data will be transmitted in clear text. However, some servers just don't have a TLS connection option. To disable TLS, use the ftp.disabletls option in the configuration file.
+
+The next thing to do is turn on Verbose or Debug mode either in the config file or using the -v or -d command line switches. This activates goftp's debugging output and you will be able to see the commands going back and forth between hugodeploy and your ftp server.
+
+If neither of those work, log an issue on github with some details from the logged output. Be sure to remove passwords and other sensitive details from the log - they appear in a couple of places.
 
 ## A few notes on code organisation
 deploy.DeployScanner traverse all files in sourceDir and compares them with what's in deployRecordDir.
