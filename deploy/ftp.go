@@ -20,6 +20,7 @@ import (
 	"errors"
 	"path"
 	"strings"
+	"os"
 
 	"github.com/dutchcoders/goftp"
 	jww "github.com/spf13/jwalterweatherman"
@@ -121,8 +122,25 @@ func (f *FTPDeployer) Initialise() error {
 
 }
 
+func makeFtpPath(path string) string {
+	fpath := path
+
+	/**
+	If the os's local path separator is not / (e.g. Windows) we have to adjust the path here
+	because FTP only accepts forward slashes
+	**/	
+	if (os.PathSeparator != '/') {		
+		fpath = strings.Replace(fpath, string(os.PathSeparator), string("/"), -1);
+		// remove potentially doubled separators
+		fpath = strings.Replace(fpath, string("//"), string("/"), -1);		
+	}
+	
+	return fpath
+}
+
 func (f *FTPDeployer) ApplyCommand(cmd *DeployCommand) error {
-	p := path.Join(f.RootDir, cmd.RelPath)
+	p := makeFtpPath(path.Join(f.RootDir, cmd.RelPath))		
+	
 	switch cmd.Command {
 	case COMMAND_FILE_ADD, COMMAND_FILE_UPD:
 		return f.UploadFile(p, cmd.Contents)
@@ -142,10 +160,11 @@ func (f *FTPDeployer) ApplyCommand(cmd *DeployCommand) error {
 	//jww.WARN.Println("SFTP Cmds not implemented yet: ", cmd.RelPath)
 }
 
-func (f *FTPDeployer) UploadFile(path string, data []byte) error {
+func (f *FTPDeployer) UploadFile(path string, data []byte) error {	
 	r := bytes.NewReader(data)
 	jww.FEEDBACK.Println("Sending file: ", path, "...")
-	jww.DEBUG.Println("Data Size: ", len(data))
+	jww.DEBUG.Println("Data Size: ", len(data))	
+	
 	if err := f.ftp.Stor(path, r); err != nil {
 		jww.ERROR.Println("FTP Error uploading file: ", path, err)
 		jww.DEBUG.Println("Data that could not be sent: ", data)
@@ -169,8 +188,9 @@ func (f *FTPDeployer) RemoveDirectory(path string) error {
 	return nil
 }
 
-func (f *FTPDeployer) RemoveFile(path string) error {
+func (f *FTPDeployer) RemoveFile(path string) error {	
 	jww.FEEDBACK.Println("Deleting file: ", path, "...")
+
 	if err := f.ftp.Dele(path); err != nil {
 		if strings.Contains(err.Error(), "No such file") {
 			jww.INFO.Println("Looks like FTP file already deleted: ", path)
@@ -185,7 +205,7 @@ func (f *FTPDeployer) RemoveFile(path string) error {
 	return nil
 }
 
-func (f *FTPDeployer) MakeDirectory(path string) error {
+func (f *FTPDeployer) MakeDirectory(path string) error {	
 	jww.FEEDBACK.Println("Creating directory: ", path, "...")
 	if err := f.ftp.Mkd(path); err != nil {
 		if strings.Contains(err.Error(), "File exists") {
