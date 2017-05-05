@@ -184,11 +184,12 @@ func createConfigFile() {
 # Connection settings for deployment target (FTP only)
 ftp:
   host: <enter host id / ip address>
-  port: <enter port - usually 21 for FTP over TLS>
+  port: <enter port - usually 21 for FTP over TLS>  
+  rootdir: <enter root directory of website, e.g. /public_html/>
+  disabletls: false  
+  credentialProvider: classic
   user: <enter user id>
   pwd: <enter password>
-  rootdir: <enter root directory of website, e.g. /public_html/>
-	disabletls: false
 
 # Connection settings for deployment target (SFTP only)
 sftp:

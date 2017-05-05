@@ -20,6 +20,7 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh"
+	"github.com/mindok/hugodeploy/cred"
 )
 
 /* NOTE: INCOMPLETE, UNTESTED CODE */
@@ -43,8 +44,32 @@ func (s *SFTPDeployer) Initialise() error {
 	// Gather together settings
 	s.HostID = viper.GetString("sftp.host")
 	s.Port = viper.GetString("sftp.port")
-	s.UID = viper.GetString("sftp.user")
-	s.PWD = viper.GetString("sftp.pwd")
+	
+	// get credentials
+	credProviderName := viper.GetString("ftp.credentialProvider")
+	if (credProviderName == "") {
+		// when no credental provider is given
+		// fall back to old style credentials
+		credProviderName = "classic"
+	} 
+	
+	jww.DEBUG.Println("CredentialProvider is ", credProviderName)
+	
+	credProvider := cred.GetCredentialProvider(credProviderName)
+	if (credProvider == nil) {
+		jww.ERROR.Println("Unknown or unsupported credential provider: ", credProviderName)
+		return errors.New ( "Unknown or unsupported credential provider: " + credProviderName );
+	}
+	
+	credentials, err := credProvider.GetCredentials("sftp")
+	if (err != nil) {
+		jww.ERROR.Println("Unable to retrieve credentials: ", err)
+		return err;
+	}			
+			
+	s.UID = credentials.UID
+	s.PWD = credentials.PWD
+	
 	jww.INFO.Println("Got SFTP settings: ", s.HostID, s.Port, s.UID)
 
 	if s.HostID == "" {
@@ -52,19 +77,12 @@ func (s *SFTPDeployer) Initialise() error {
 	}
 	if s.Port == "" {
 		serr = serr + "Port not found. Define sftp.port in config file. "
-	}
-	if s.UID == "" {
-		serr = serr + "UID not found. Define sftp.user in config file. "
-	}
-	if s.PWD == "" {
-		serr = serr + "PWD not found. Define sftp.pwd in config file. "
-	}
-
+	}	
 	if serr != "" {
 		return errors.New("Error initialising SFTP Deployer. " + serr)
 	}
 
-	err := errors.New("") //Must be away to avoid this, but double function returns below barf
+	err = errors.New("") //Must be away to avoid this, but double function returns below barf
 
 	//Attempt to connect. First create the SSH client:
 	config := &ssh.ClientConfig{

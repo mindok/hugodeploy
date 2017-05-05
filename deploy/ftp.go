@@ -21,8 +21,10 @@ import (
 	"path"
 	"strings"
 	"os"
-
+	
 	"github.com/dutchcoders/goftp"
+	"github.com/mindok/hugodeploy/cred"
+	
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 )
@@ -47,8 +49,32 @@ func (f *FTPDeployer) Initialise() error {
 	// Gather together settings
 	f.HostID = viper.GetString("ftp.host")
 	f.Port = viper.GetString("ftp.port")
-	f.UID = viper.GetString("ftp.user")
-	f.PWD = viper.GetString("ftp.pwd")
+	
+	// get credentials
+	credProviderName := viper.GetString("ftp.credentialProvider")
+	if (credProviderName == "") {
+		// when no credental provider is given
+		// fall back to old style credentials
+		credProviderName = "classic"
+	} 
+	
+	jww.DEBUG.Println("CredentialProvider is ", credProviderName)
+	
+	credProvider := cred.GetCredentialProvider(credProviderName)
+	if (credProvider == nil) {
+		jww.ERROR.Println("Unknown or unsupported credential provider: ", credProviderName)
+		return errors.New ( "Unknown or unsupported credential provider: " + credProviderName );
+	}
+	
+	credentials, err := credProvider.GetCredentials("ftp")
+	if (err != nil) {
+		jww.ERROR.Println("Unable to retrieve credentials: ", err)
+		return err;
+	}			
+			
+	f.UID = credentials.UID
+	f.PWD = credentials.PWD
+	
 	f.RootDir = viper.GetString("ftp.rootdir")
 	f.DisableTLS = false
 	if viper.IsSet("ftp.disabletls") {
@@ -62,13 +88,7 @@ func (f *FTPDeployer) Initialise() error {
 	}
 	if f.Port == "" {
 		serr = serr + "Port not found. Define ftp.port in config file. "
-	}
-	if f.UID == "" {
-		serr = serr + "UID not found. Define ftp.user in config file. "
-	}
-	if f.PWD == "" {
-		serr = serr + "PWD not found. Define ftp.pwd in config file. "
-	}
+	}		
 	if f.RootDir == "" {
 		f.RootDir = "/"
 		jww.WARN.Println("FTP: Website root directory not found (ftp: rootdir in config). Defaulting to '/'")
@@ -77,9 +97,7 @@ func (f *FTPDeployer) Initialise() error {
 	if serr != "" {
 		jww.ERROR.Println("Error initialising FTP Deployer: ", serr)
 		panic(errors.New("Error initialising FTP Deployer. " + serr))
-	}
-
-	var err error
+	}	
 
 	jww.FEEDBACK.Println("Creating FTP connection... ")
 	//Create initial connection
